@@ -15,6 +15,11 @@ k_down = pygame.K_s
 k_left = pygame.K_a
 k_right = pygame.K_d
 
+stehen = pygame.image.load("graphics/robot/stand.png")
+sprung = pygame.image.load("graphics/robot/sprung.png")
+rechtsgehen = [pygame.image.load("graphics/robot/rechts1.png"), pygame.image.load("graphics/robot/rechts2.png"), pygame.image.load("graphics/robot/rechts3.png"), pygame.image.load("graphics/robot/rechts4.png"), pygame.image.load("graphics/robot/rechts5.png"), pygame.image.load("graphics/robot/rechts6.png"), pygame.image.load("graphics/robot/rechts7.png"), pygame.image.load("graphics/robot/rechts8.png")]
+linksgehen = [pygame.image.load("graphics/robot/links1.png"), pygame.image.load("graphics/robot/links2.png"), pygame.image.load("graphics/robot/links3.png"), pygame.image.load("graphics/robot/links4.png"), pygame.image.load("graphics/robot/links5.png"), pygame.image.load("graphics/robot/links6.png"), pygame.image.load("graphics/robot/links7.png"), pygame.image.load("graphics/robot/links8.png")]
+
 
 playerImg = pygame.image.load("graphics/zelda_test_char.png").convert_alpha()
 playerX = 370
@@ -60,7 +65,18 @@ def startscreen():
     button("Credits",       50, 580, 500, 100, "White", "Green")
     button("Exit",          50, 780, 500, 100, "White", "Green")
 
-def zeichnen():
+def zeichnen(liste):
+    global step_rechts, step_links
+    if step_rechts == 63:
+        step_rechts = 0
+    if step_links == 63:
+        step_links = 0
+
+    if player_state[0]:
+        screen.blit(linksgehen[step_links // 8], (playerX,playerY))
+    if player_state[1]:
+        screen.blit(linksgehen[step_rechts // 8], (playerX,playerY))
+
     pygame.display.update()
 
 
@@ -72,7 +88,14 @@ def level(level_val):
 def player(playerImg, playerX, playerY):
     screen.blit(playerImg, (playerX, playerY))
 
+
 runtime = True
+
+#[links, rechts, stand, sprung]
+player_state = [0,0,0,0]
+step_rechts = 0
+step_links = 0
+
 while runtime:
 
     pressed = pygame.key.get_pressed()
@@ -83,13 +106,18 @@ while runtime:
             runtime = False
         if pressed[pygame.K_ESCAPE] and option != "Home":
             option = "Home"
+    player_state = [0,0,1,0]
     if pressed[k_up]:
         playerY -= 1*playerSpeed
     if pressed[k_down]:
         playerY += 1*playerSpeed
     if pressed[k_left]:
+        player_state = [1,0,0,0]
+        step_links +=1
         playerX -= 1*playerSpeed
     if pressed[k_right]:
+        step_rechts +=1
+        player_state = [0,1,0,0]
         playerX += 1*playerSpeed
 
     if option == "Home":
@@ -103,7 +131,7 @@ while runtime:
 
 
 
-    zeichnen()
+    zeichnen(player_state)
     maus_pos = pygame.mouse.get_pos()
     maus_klick = pygame.mouse.get_pressed()
     clock.tick(fps)
