@@ -1,0 +1,15 @@
+
+
+|
+|
+|      Y
+|
+|
++
+                x
+        -------------- +
+
+
+gedrueckt = pygame.key.get_pressed()
+if gedruekt[pygame.K_Space]:
+    .......
