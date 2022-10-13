@@ -13,3 +13,29 @@
 gedrueckt = pygame.key.get_pressed()
 if gedruekt[pygame.K_Space]:
     .......
+
+
+
+    def zeichnen(liste):
+    global step_rechts, step_links, step_forward, step_backward
+    if step_rechts == 8:
+        step_rechts = 0
+    if step_links == 8:
+        step_links = 0
+    if step_forward == 8:
+        step_forward = 0
+    if step_backward == 8:
+        step_backward = 0
+
+    if player_state[0]:
+        screen.blit(linksgehen[step_links // 3], (playerX,playerY))
+    if player_state[1]:
+        screen.blit(rechtsgehen[step_rechts // 3], (playerX,playerY))
+    if player_state[2]:
+        screen.blit(stehen, (playerX, playerY))
+    if player_state[3]:
+        screen.blit(backwardgehen[step_backward // 3], (playerX, playerY))
+    if player_state[4]:
+        screen.blit(forwardgehen[step_forward // 3], (playerX, playerY))
+
+    pygame.display.update()

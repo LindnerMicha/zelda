@@ -14,28 +14,122 @@ k_up = pygame.K_w
 k_down = pygame.K_s
 k_left = pygame.K_a
 k_right = pygame.K_d
-last_dir = [0, 0, 0, 0]
+k_shoot = pygame.K_SPACE
+last_dir = [0,0]
 
-stehen = pygame.image.load("graphics/player/player_standing.png").convert_alpha()
+
+runtime = True
+
+#[links, rechts, stand, backward, forward]
+
+
+#playerImg = pygame.image.load("graphics/zelda_test_char.png").convert_alpha()
+
+maus_aktiv = False
+option = "Home"
+
+stehen_links = pygame.image.load("graphics/player/player_standing_left.png").convert_alpha()
+stehen_rechts = pygame.image.load("graphics/player/player_standing_right.png").convert_alpha()
 rechtsgehen = [pygame.image.load("graphics/player/player_right1.png").convert_alpha(), pygame.image.load("graphics/player/player_right2.png").convert_alpha(), pygame.image.load("graphics/player/player_right3.png").convert_alpha()]
 linksgehen = [pygame.image.load("graphics/player/player_left1.png").convert_alpha(), pygame.image.load("graphics/player/player_left2.png").convert_alpha(), pygame.image.load("graphics/player/player_left3.png").convert_alpha()]
 forwardgehen = [pygame.image.load("graphics/player/player_forward1.png").convert_alpha(), pygame.image.load("graphics/player/player_forward2.png").convert_alpha(), pygame.image.load("graphics/player/player_forward3.png").convert_alpha()]
 backwardgehen = [pygame.image.load("graphics/player/player_backward1.png").convert_alpha(), pygame.image.load("graphics/player/player_backward2.png").convert_alpha(), pygame.image.load("graphics/player/player_backward3.png").convert_alpha()]
 
-#playerImg = pygame.image.load("graphics/zelda_test_char.png").convert_alpha()
-playerX = 250
-playerY = 250
-playerSpeed = 5
 
 background = pygame.image.load("graphics/test_bgImg.jpg").convert_alpha()
+
+class Spieler:
+    def __init__(self,playerX, playerY, playerSpeed, breite, hoehe, player_state, step_rechts, step_links, step_forward, step_backward, ok_shoot):
+        self.playerX = playerX
+        self.playerY = playerY
+        self.playerSpeed = playerSpeed
+        self.breite = breite
+        self.hoehe = hoehe
+        self.player_state = player_state
+        self.step_rechts = step_rechts
+        self.step_links = step_links
+        self.step_forward = step_forward
+        self.step_backward = step_backward
+        self.ok_shoot = ok_shoot
+        self.last_dir = last_dir
+
+    def laufen(self, liste):
+        if liste[0]:
+            self.playerX -= self.playerSpeed
+            self.player_state = [1, 0, 0, 0, 0]
+            self.step_links += 1
+        if liste[1]:
+            self.playerX += self.playerSpeed
+            self.player_state = [0, 1, 0, 0, 0]
+            self.step_rechts += 1
+        if liste[2]:
+            self.playerY -= self.playerSpeed
+            self.player_state = [0, 0, 0, 0, 1]
+            self.step_forward +=1
+        if liste[3]:
+            self.playerY += self.playerSpeed
+            self.player_state = [0, 0, 0, 1, 0]
+            self.step_backward += 1
+
+
+    def spieler_blit(self):
+        if self.step_rechts == 8:
+            self.step_rechts = 0
+        if self.step_links == 8:
+            self.step_links = 0
+        if self.step_forward == 8:
+            self.step_forward = 0
+        if self.step_backward == 8:
+            self.step_backward = 0
+
+        if self.player_state[0]:
+            screen.blit(linksgehen[self.step_links // 3], (self.playerX, self.playerY))
+        if self.player_state[1]:
+            screen.blit(rechtsgehen[self.step_rechts // 3], (self.playerX, self.playerY))
+        if self.player_state[2]:
+            if last_dir[0]:
+                screen.blit(stehen_links, (self.playerX, self.playerY))
+            else:
+                screen.blit(stehen_rechts, (self.playerX, self.playerY))                                     #----------------------------------
+        if self.player_state[3]:
+            screen.blit(backwardgehen[self.step_backward // 3], (self.playerX, self.playerY))
+        if self.player_state[4]:
+            screen.blit(forwardgehen[self.step_forward // 3], (self.playerX, self.playerY))
+
+    def resetSchritte(self):
+        self.step_rechts = 6
+        self.step_links = 6
+        self.step_forward = 6
+        self.step_backward = 6
+    def stehen(self):
+        self.player_state = [0,0,1,0,0]
+        self.resetSchritte()
+
+
+class kugel:
+    def __init__(self, playerX, playerY, last_dir, kug_rad, kud_color, kug_speed):
+        self.x = playerX
+        self.y = playerY
+        self.kug_speed = kug_speed
+        if last_dir[0]:                                                                        # wo soll die kugel starten (links / rechts)
+            self.x += 5
+            self.kug_speed = -1 * kug_speed
+        elif last_dir[1]:
+            self.x += 75                                                                       # wo soll die kugel starten (links / rechts)
+            self.kug_speed = kug_speed
+        self.y += 45                                                                           # höhe des abfeuerns
+        self.kug_rad = kug_rad
+        self.kug_color = kud_color
+
+    def bewegen(self):
+        self.x += self.kug_speed
+
+    def zeichnen(self):
+        pygame.draw.circle(screen, self.kug_color,(self.x,self.y), self.kug_rad, 0 )           # 0 am ende sagt aus ob gefüllt oder nicht
 
 def textObjekt(text, pixel_font):
     textFlaeche = pixel_font.render(text, True, (0, 0, 0))
     return textFlaeche, textFlaeche.get_rect()
-
-maus_aktiv = False
-option = "Home"
-
 def button(but_txt, but_x, but_y, but_laenge, but_hoehe, but_color_0, but_color_1):
     global maus_aktiv
     global option
@@ -60,61 +154,33 @@ def button(but_txt, but_x, but_y, but_laenge, but_hoehe, but_color_0, but_color_
     textGrund, textkasten = textObjekt(but_txt, pixel_font)
     textkasten.center = ((but_x+(but_laenge/2)),(but_y+(but_hoehe/2)))
     screen.blit(textGrund, textkasten)
-
 def startscreen():
     screen.blit(background, (0, 0))
     button("Start",         50, 180, 500, 100, "White", "Green")
     button("Einstellungen", 50, 380, 500, 100, "White", "Green")
     button("Credits",       50, 580, 500, 100, "White", "Green")
     button("Exit",          50, 780, 500, 100, "White", "Green")
-
 def infoleiste():
     pygame.draw.rect(screen, (142,255,57), (0, 1010, 1920, 80))
     button("Home",          20, 1020, 200, 50, "Red", "Green")
     button("Settings",      1700, 1020, 200, 50, "Red", "Green")
-
-def zeichnen(liste):
-    global step_rechts, step_links, step_forward, step_backward
-    if step_rechts == 8:
-        step_rechts = 0
-    if step_links == 8:
-        step_links = 0
-    if step_forward == 8:
-        step_forward = 0
-    if step_backward == 8:
-        step_backward = 0
-
-    if player_state[0]:
-        screen.blit(linksgehen[step_links // 3], (playerX,playerY))
-    if player_state[1]:
-        screen.blit(rechtsgehen[step_rechts // 3], (playerX,playerY))
-    if player_state[2]:
-        screen.blit(stehen, (playerX, playerY))
-    if player_state[3]:
-        screen.blit(backwardgehen[step_backward // 3], (playerX, playerY))
-    if player_state[4]:
-        screen.blit(forwardgehen[step_forward // 3], (playerX, playerY))
-
-    pygame.display.update()
-
-
 def level(level_val):
     if level_val == 0:
         background = pygame.image.load("graphics/lvl_text_bg.png").convert_alpha()
         screen.blit(background, (0, 0))
+def draw():
+    spieler1.spieler_blit()
+    for k in kugeln:
+        k.zeichnen()
+    pygame.display.update()
 
-def player(playerImg, playerX, playerY):
-    screen.blit(playerImg, (playerX, playerY))
+spieler1 = Spieler(250,250, 3, 64,64,[0,0,1,0,0], 0,0,0,0, 0)
+kugeln = []
+spieler1.ok_shoot = True
 
 
-runtime = True
 
-#[links, rechts, stand, backward, forward]
-step_rechts = 0
-step_links = 0
-step_forward = 0
-step_backward = 0
-player_state = [0, 0, 1, 0, 0]
+
 
 while runtime:
 
@@ -129,39 +195,45 @@ while runtime:
 
     #player_state = [0, 0, 1, 0, 0]
     if pressed[k_up]:
-        player_state = [0, 0, 0, 0, 1]
-        step_forward +=1
-        playerY -= 1*playerSpeed
+        spieler1.laufen([0,0,1,0])
     if pressed[k_down]:
-        player_state = [0, 0, 0, 1, 0]
-        step_backward += 1
-        playerY += 1*playerSpeed
+        spieler1.laufen([0,0,0,1])
     if pressed[k_left]:
-        player_state = [1, 0, 0, 0, 0]
-        step_links +=1
-        playerX -= 1*playerSpeed
+        spieler1.laufen([1,0,0,0])
+        last_dir = [1,0]
     if pressed[k_right]:
-        step_rechts +=1
-        player_state = [0, 1, 0, 0, 0]
-        playerX += 1*playerSpeed
+        spieler1.laufen([0,1,0,0])
+        last_dir = [0,1]
+    if pressed[k_up] == False and pressed[k_down] == False and pressed[k_left] == False and pressed[k_right] == False:
+        spieler1.stehen()
+
 
     if option == "Home":
         startscreen()
     elif option == "Start":
         level(level_val)
         infoleiste()
-        #player(playerImg, playerX, playerY)
         pass
     elif option == "Credits":
         pass
 
+    if pressed[k_shoot]:
+        if len(kugeln) <= 4 and spieler1.ok_shoot:  # maximale anzahl an zu schießenden Kugeln festlegen
+            kugeln.append(kugel(round(spieler1.playerX), round(spieler1.playerY), last_dir, 4, (0, 0, 0), 7))
+        spieler1.ok_shoot = False
+
+    if not pressed[k_shoot]:
+        spieler1.ok_shoot = True
+
+    for k in kugeln:
+        if k.x >= 0 and k.x <= 1800:
+            k.bewegen()
+        else:
+            kugeln.remove(k)
 
 
-    zeichnen(player_state)
     maus_pos = pygame.mouse.get_pos()
     maus_klick = pygame.mouse.get_pressed()
     clock.tick(fps)
+    draw()
     #pygame.time.wait(10)                        # 10 ms delay (wegen maus)
-
-
-
