@@ -110,7 +110,6 @@ def player(playerImg, playerX, playerY):
 runtime = True
 
 #[links, rechts, stand, backward, forward]
-player_state = [0, 0, 0, 0, 0]
 step_rechts = 0
 step_links = 0
 step_forward = 0
