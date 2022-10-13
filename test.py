@@ -14,12 +14,13 @@ k_up = pygame.K_w
 k_down = pygame.K_s
 k_left = pygame.K_a
 k_right = pygame.K_d
+last_dir = [0, 0, 0, 0]
 
 stehen = pygame.image.load("graphics/player/player_standing.png").convert_alpha()
-sprung = pygame.image.load("graphics/robot/sprung.png").convert_alpha()
 rechtsgehen = [pygame.image.load("graphics/player/player_right1.png").convert_alpha(), pygame.image.load("graphics/player/player_right2.png").convert_alpha(), pygame.image.load("graphics/player/player_right3.png").convert_alpha()]
 linksgehen = [pygame.image.load("graphics/player/player_left1.png").convert_alpha(), pygame.image.load("graphics/player/player_left2.png").convert_alpha(), pygame.image.load("graphics/player/player_left3.png").convert_alpha()]
 forwardgehen = [pygame.image.load("graphics/player/player_forward1.png").convert_alpha(), pygame.image.load("graphics/player/player_forward2.png").convert_alpha(), pygame.image.load("graphics/player/player_forward3.png").convert_alpha()]
+backwardgehen = [pygame.image.load("graphics/player/player_backward1.png").convert_alpha(), pygame.image.load("graphics/player/player_backward2.png").convert_alpha(), pygame.image.load("graphics/player/player_backward3.png").convert_alpha()]
 
 #playerImg = pygame.image.load("graphics/zelda_test_char.png").convert_alpha()
 playerX = 250
@@ -29,7 +30,7 @@ playerSpeed = 5
 background = pygame.image.load("graphics/test_bgImg.jpg").convert_alpha()
 
 def textObjekt(text, pixel_font):
-    textFlaeche = pixel_font.render(text, True, (0,0,0))
+    textFlaeche = pixel_font.render(text, True, (0, 0, 0))
     return textFlaeche, textFlaeche.get_rect()
 
 maus_aktiv = False
@@ -73,7 +74,7 @@ def infoleiste():
     button("Settings",      1700, 1020, 200, 50, "Red", "Green")
 
 def zeichnen(liste):
-    global step_rechts, step_links, step_forward
+    global step_rechts, step_links, step_forward, step_backward
     if step_rechts == 8:
         step_rechts = 0
     if step_links == 8:
@@ -87,6 +88,8 @@ def zeichnen(liste):
         screen.blit(rechtsgehen[step_rechts // 3], (playerX,playerY))
     if player_state[2]:
         screen.blit(stehen, (playerX, playerY))
+    if player_state[3]:
+        screen.blit(backwardgehen[step_forward // 3], (playerX, playerY))
     if player_state[4]:
         screen.blit(forwardgehen[step_forward // 3], (playerX, playerY))
 
@@ -104,10 +107,13 @@ def player(playerImg, playerX, playerY):
 
 runtime = True
 
-#[links, rechts, stand, sprung, forward]
+#[links, rechts, stand, backward, forward]
 player_state = [0, 0, 0, 0, 0]
 step_rechts = 0
 step_links = 0
+step_forward = 0
+step_backward = 0
+player_state = [0, 0, 1, 0, 0]
 
 while runtime:
 
@@ -119,11 +125,14 @@ while runtime:
             runtime = False
         if pressed[pygame.K_ESCAPE] and option != "Home":
             option = "Home"
-    player_state = [0, 0, 1, 0, 0]
+    #player_state = [0, 0, 1, 0, 0]
     if pressed[k_up]:
         player_state = [0, 0, 0, 0, 1]
+        step_forward +=1
         playerY -= 1*playerSpeed
     if pressed[k_down]:
+        player_state = [0, 0, 0, 1, 0]
+        step_backward += 1
         playerY += 1*playerSpeed
     if pressed[k_left]:
         player_state = [1, 0, 0, 0, 0]
@@ -144,7 +153,15 @@ while runtime:
     elif option == "Credits":
         pass
 
-
+    # [links, rechts, stand, backward, forward]
+    if not pressed[k_up] and player_state == [0, 0, 0, 0, 1]:
+        forwardgehen[1]
+    if not pressed[k_down] and player_state == [0, 0, 0, 1, 0]:
+        backwardgehen[1]
+    if not pressed[k_left] and player_state == [1, 0, 0, 0, 0]:
+        linksgehen[1]
+    if not pressed[k_right] and player_state == [0, 1, 0, 0, 0]:
+        rechtsgehen[1]
 
     zeichnen(player_state)
     maus_pos = pygame.mouse.get_pos()
