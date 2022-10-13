@@ -81,6 +81,8 @@ def zeichnen(liste):
         step_links = 0
     if step_forward == 8:
         step_forward = 0
+    if step_backward == 8:
+        step_backward = 0
 
     if player_state[0]:
         screen.blit(linksgehen[step_links // 3], (playerX,playerY))
@@ -89,7 +91,7 @@ def zeichnen(liste):
     if player_state[2]:
         screen.blit(stehen, (playerX, playerY))
     if player_state[3]:
-        screen.blit(backwardgehen[step_forward // 3], (playerX, playerY))
+        screen.blit(backwardgehen[step_backward // 3], (playerX, playerY))
     if player_state[4]:
         screen.blit(forwardgehen[step_forward // 3], (playerX, playerY))
 
@@ -125,6 +127,7 @@ while runtime:
             runtime = False
         if pressed[pygame.K_ESCAPE] and option != "Home":
             option = "Home"
+
     #player_state = [0, 0, 1, 0, 0]
     if pressed[k_up]:
         player_state = [0, 0, 0, 0, 1]
@@ -153,15 +156,7 @@ while runtime:
     elif option == "Credits":
         pass
 
-    # [links, rechts, stand, backward, forward]
-    if not pressed[k_up] and player_state == [0, 0, 0, 0, 1]:
-        forwardgehen[1]
-    if not pressed[k_down] and player_state == [0, 0, 0, 1, 0]:
-        backwardgehen[1]
-    if not pressed[k_left] and player_state == [1, 0, 0, 0, 0]:
-        linksgehen[1]
-    if not pressed[k_right] and player_state == [0, 1, 0, 0, 0]:
-        rechtsgehen[1]
+
 
     zeichnen(player_state)
     maus_pos = pygame.mouse.get_pos()
