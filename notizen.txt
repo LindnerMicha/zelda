@@ -81,4 +81,8 @@ while playing:
             playing = False
         elif event.type == pg.MOUSEBUTTONDOWN:
             blockolize()
-            pg.display.update()ä
+            pg.display.update()
+
+
+
+--------------------------------------------

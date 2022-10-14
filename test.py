@@ -1,9 +1,10 @@
 import pygame
 import sys
+import random
 
 pygame.display.set_caption("Zelda")
 pygame.init()
-screen = pygame.display.set_mode([1920, 1080]) #1920x1080
+screen = pygame.display.set_mode([1920, 1080])  #1920x1080
 clock = pygame.time.Clock()
 fps = 60
 maus_pos = pygame.mouse.get_pos()
@@ -35,6 +36,9 @@ linksgehen = [pygame.image.load("graphics/player/player_left1.png").convert_alph
 forwardgehen = [pygame.image.load("graphics/player/player_forward1.png").convert_alpha(), pygame.image.load("graphics/player/player_forward2.png").convert_alpha(), pygame.image.load("graphics/player/player_forward3.png").convert_alpha()]
 backwardgehen = [pygame.image.load("graphics/player/player_backward1.png").convert_alpha(), pygame.image.load("graphics/player/player_backward2.png").convert_alpha(), pygame.image.load("graphics/player/player_backward3.png").convert_alpha()]
 
+#gras = pygame.image.load("graphics/tiles/Grass_64x64.png")
+#brick = pygame.image.load("graphics/tiles/Dirt_Road_64x64.png")
+#dirt = pygame.image.load("graphics/tiles/Brick_Wall_64x64.png")
 
 background = pygame.image.load("graphics/test_bgImg.jpg").convert_alpha()
 
@@ -65,7 +69,7 @@ class Spieler:
         if liste[2]:
             self.playerY -= self.playerSpeed
             self.player_state = [0, 0, 0, 0, 1]
-            self.step_forward +=1
+            self.step_forward += 1
         if liste[3]:
             self.playerY += self.playerSpeed
             self.player_state = [0, 0, 0, 1, 0]
@@ -101,11 +105,10 @@ class Spieler:
         self.step_links = 6
         self.step_forward = 6
         self.step_backward = 6
+
     def stehen(self):
         self.player_state = [0,0,1,0,0]
         self.resetSchritte()
-class level():
-    def __init__(self):
 
 class kugel:
     def __init__(self, playerX, playerY, last_dir, kug_rad, kud_color, kug_speed):
@@ -126,7 +129,7 @@ class kugel:
         self.x += self.kug_speed
 
     def zeichnen(self):
-        pygame.draw.circle(screen, self.kug_color,(self.x,self.y), self.kug_rad, 0 )           # 0 am ende sagt aus ob gefüllt oder nicht
+        pygame.draw.circle(screen, self.kug_color,(self.x,self.y), self.kug_rad, 0)           # 0 am ende sagt aus ob gefüllt oder nicht
 
 def textObjekt(text, pixel_font):
     textFlaeche = pixel_font.render(text, True, (0, 0, 0))
@@ -165,16 +168,19 @@ def infoleiste():
     pygame.draw.rect(screen, (142,255,57), (0, 1010, 1920, 80))
     button("Home",          20, 1020, 200, 50, "Red", "Green")
     button("Settings",      1700, 1020, 200, 50, "Red", "Green")
-def level(level_val):
+
+#def level(level_val):
     if level_val == 0:
-        background = pygame.image.load("graphics/lvl_text_bg.png").convert_alpha()
+        background = pygame.image.load("graphics/test_arena.png").convert_alpha()
         screen.blit(background, (0, 0))
 def draw():
+
     spieler1.spieler_blit()
     for k in kugeln:
         k.zeichnen()
     pygame.display.update()
 
+#level1 = level(0, 0, 0, 0, True)
 spieler1 = Spieler(250,250, 3, 64,64,[0,0,1,0,0], 0,0,0,0, 0)
 kugeln = []
 spieler1.ok_shoot = True
@@ -212,9 +218,10 @@ while runtime:
     if option == "Home":
         startscreen()
     elif option == "Start":
-        level(level_val)
+        pygame.display.update()
+        #level1.create_level()
         infoleiste()
-        pass
+
     elif option == "Credits":
         pass
 
@@ -235,6 +242,6 @@ while runtime:
 
     maus_pos = pygame.mouse.get_pos()
     maus_klick = pygame.mouse.get_pressed()
-    clock.tick(fps)
+    clock.tick(60)
     draw()
     #pygame.time.wait(10)                        # 10 ms delay (wegen maus)
