@@ -6,7 +6,7 @@ width = 0
 height = 0
 rect_xpos = 0
 rect_ypos = 0
-materials = []
+materials = [" ", " ", " ", "D","B"]          # gras, dirt, brick
 gen_map = [[],
            [],
            [],
@@ -45,6 +45,7 @@ while runtime:
         if width <= 30:
             if rand == 0 or rand == 1 or rand == 2:
                 screen.blit(gras, (rect_xpos, rect_ypos))
+                gen_map [[width]] = materials[rand]
             elif rand == 3:
                 screen.blit(brick, (rect_xpos, rect_ypos))
             else:
