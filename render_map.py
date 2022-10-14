@@ -6,6 +6,7 @@ width = 0
 height = 0
 rect_xpos = 0
 rect_ypos = 0
+materials = []
 gen_map = [[],
            [],
            [],

@@ -104,7 +104,8 @@ class Spieler:
     def stehen(self):
         self.player_state = [0,0,1,0,0]
         self.resetSchritte()
-
+class level():
+    def __init__(self):
 
 class kugel:
     def __init__(self, playerX, playerY, last_dir, kug_rad, kud_color, kug_speed):
